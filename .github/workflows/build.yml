@@ -1,4 +1,4 @@
-name: Build APK
+name: Build PresetOne APK
 
 on:
   workflow_dispatch:
@@ -10,78 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - uses: gradle/actions/setup-gradle@v4
-
-      - name: Extract project
-        run: unzip -o PresetOne-Android-MVP.zip
-
-      - name: Fix source code
-        run: |
-          python3 <<'PY'
-          from pathlib import Path
-
-          p = Path("PresetOne/app/src/main/java/com/presetone/app/MainActivity.kt")
-          s = p.read_text()
-
-          s = s.replace(
-              "import androidx.activity.ComponentActivity",
-              "import androidx.activity.ComponentActivity\nimport androidx.activity.compose.setContent"
-          )
-
-          s = s.replace(
-              "import androidx.compose.ui.graphics.Color",
-              "import androidx.compose.ui.graphics.Color\nimport androidx.compose.ui.platform.LocalContext"
-          )
-
-          s = s.replace(
-              "import android.content.ContentValues",
-              "import android.content.ContentValues\nimport android.content.Context"
-          )
-
-          s = s.replace(
-              "fun PresetOneApp() {\n",
-              "fun PresetOneApp() {\n    val context = LocalContext.current\n"
-          )
-
-          s = s.replace(
-              "(LocalContext.current as android.content.Context).contentResolver",
-              "context.contentResolver"
-          )
-
-          s = s.replace(
-              "exportBitmap(this, original!!, edit)",
-              "exportBitmap(context, original!!, edit)"
-          )
-
-          s = s.replace(
-              "Color.red(c)",
-              "android.graphics.Color.red(c)"
-          )
-          s = s.replace(
-              "Color.green(c)",
-              "android.graphics.Color.green(c)"
-          )
-          s = s.replace(
-              "Color.blue(c)",
-              "android.graphics.Color.blue(c)"
-          )
-
-          s = s.replace(
-              "private fun exportBitmap(activity: ComponentActivity",
-              "private fun exportBitmap(activity: Context"
-          )
-
-          p.write_text(s)
-          PY
-
-          sed -i "/org.jetbrains.kotlin.android/d" PresetOne/app/build.gradle.kts
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build APK
         run: cd PresetOne && gradle assembleDebug
