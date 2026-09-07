@@ -22,15 +22,10 @@ jobs:
       - name: Extract project
         run: unzip -o PresetOne-Android-MVP.zip
 
-      - name: Fix Kotlin and source code
+      - name: Fix project
         run: |
           sed -i "/org.jetbrains.kotlin.android/d" PresetOne/app/build.gradle.kts
-          sed -i '/import androidx.activity.ComponentActivity/a import androidx.activity.compose.setContent\nimport androidx.compose.ui.platform.LocalContext' PresetOne/app/src/main/java/com/presetone/app/MainActivity.kt
-          sed -i 's/exportBitmap(this, original!!, edit)/exportBitmap(LocalContext.current, original!!, edit)/' PresetOne/app/src/main/java/com/presetone/app/MainActivity.kt
-          sed -i 's/private fun exportBitmap(activity: ComponentActivity/private fun exportBitmap(activity: android.content.Context/' PresetOne/app/src/main/java/com/presetone/app/MainActivity.kt
-          sed -i 's/Color.red(c)/android.graphics.Color.red(c)/g' PresetOne/app/src/main/java/com/presetone/app/MainActivity.kt
-          sed -i 's/Color.green(c)/android.graphics.Color.green(c)/g' PresetOne/app/src/main/java/com/presetone/app/MainActivity.kt
-          sed -i 's/Color.blue(c)/android.graphics.Color.blue(c)/g' PresetOne/app/src/main/java/com/presetone/app/MainActivity.kt
+          sed -i 's/LocalContext.current/android.content.Context/' PresetOne/app/src/main/java/com/presetone/app/MainActivity.kt
 
       - name: Build APK
         run: cd PresetOne && gradle assembleDebug
